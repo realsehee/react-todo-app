@@ -57,7 +57,6 @@ export default function App (){
     });
     setTodoData(newTodoData);
   }
-
   
   return(
     <div className="container">
