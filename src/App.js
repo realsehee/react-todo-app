@@ -1,12 +1,14 @@
-import React, {useState} from "react";
+import React, {Component} from "react";
 import "./App.css"
 
-export default function App (){
+export default class App extends Component{
 
-  const [todoData, setTodoData] = useState([]);
-  const [value, setValue] = useState("");
+  state = {
+    todoData : [],
+    value:""
 
-  const btnStyle = {
+  }
+  btnStyle = {
     color : "#fff",
     border : "none",
     padding : "5px 9px",
@@ -14,7 +16,7 @@ export default function App (){
     cursor : "pointer",
     float : "right"
   }
-  const getStyle = (completed) =>{
+  getStyle = (completed) =>{
     return {
       padding : "10px",
       borderBottom : "1px #ccc dotted",
@@ -22,76 +24,78 @@ export default function App (){
     }
   }
 
-  const handleClick = (id) =>{
+  handleClick = (id) =>{
     
-    let newTodoData = todoData.filter(data => data.id !==id);
+    let newTodoData = this.state.todoData.filter(data => data.id !==id);
     console.log('newTodoData',newTodoData);
-    setTodoData(newTodoData);
+    this.setState({todoData: newTodoData});
   }
 
-  const handleChange = (e) => {
-    setValue(e.target.value);
+  handleChange = (e) => {
+    this.setState({value: e.target.value});
+    this.setState({valye: e.target.value});
   }
 
-  const handleSubmit = (e) => {
+  handleSubmit = (e) => {
     e.preventDefault(); //리로드 되는 것 방지
 
     //새로운 할일 데이터
     let newTodo = {
       id : Date.now(),
-      title: value,
+      title: this.state.value,
       completed : false
     }
 
     //원래 있던 할 일에 새로운 할 일 더해주기
-    setTodoData(prev => [...prev, newTodo]);
-    setValue("");
-
+    this.setState({todoData:[...this.state.todoData, newTodo], value:""})
   }
-  const handleCompleteChange = (id) =>{
-    let newTodoData = todoData.map(data => {
+  handleCompleteChange = (id) =>{
+    let newTodoData = this.state.todoData.map(data => {
       if(data.id == id){
         data.completed = ! data.complted;
       }
       return data;
     });
-    setTodoData(newTodoData);
+
+    this.setState({todoData : newTodoData});
   }
-  
-  return(
-    <div className="container">
-      <div className="todoBlock">
-        <div className="title">
-          <h1>할 일 목록</h1>
+
+  render() {
+    return(
+      <div className="container">
+        <div className="todoBlock">
+          <div className="title">
+            <h1>할 일 목록</h1>
+          </div>
+
+      {this.state.todoData.map((data) =>(
+          <div style={this.getStyle(data.completed)} key={data.id}>
+            <input type="checkbox" defaultChecked={false} onChange={() => this.handleCompleteChange(data.id)}/>
+              {data.title}
+            <button style={this.btnStyle} onClick={() => this.handleClick(data.id)}>x</button>
+          </div>
+        ))}
+
+          <form style={{display : 'flex'}} onSubmit={this.handleSubmit}>
+            <input 
+              type="text" 
+              name="value" 
+              style={{flex:'10', padding:'5px'}}
+              placeholder="해야 할 일을 입력하세요."
+              value={this.state.value}
+              onChange={this.handleChange}
+            />
+            <input
+              type="submit"
+              valye="입력"
+              className="btn"
+              style={{flex:'1'}}
+            />            
+
+          </form>
+
         </div>
-
-    {todoData.map((data) =>(
-        <div style={getStyle(data.completed)} key={data.id}>
-          <input type="checkbox" defaultChecked={false} onChange={() => handleCompleteChange(data.id)}/>
-            {data.title}
-          <button style={btnStyle} onClick={() => handleClick(data.id)}>x</button>
-        </div>
-      ))}
-
-        <form style={{display : 'flex'}} onSubmit={handleSubmit}>
-          <input 
-            type="text" 
-            name="value" 
-            style={{flex:'10', padding:'5px'}}
-            placeholder="해야 할 일을 입력하세요."
-            value={value}
-            onChange={handleChange}
-          />
-          <input
-            type="submit"
-            valye="입력"
-            className="btn"
-            style={{flex:'1'}}
-          />            
-
-        </form>
-
       </div>
-    </div>
-  );
+    );
+  }
 }
